@@ -26,7 +26,6 @@ jobs:
     name: Build Package
     runs-on: ubuntu-latest
     needs: discover
-    if: needs.discover.outputs.any_changed == 'true'
 
     strategy:
       fail-fast: false
