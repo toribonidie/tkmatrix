@@ -2,6 +2,8 @@ name: Build Images
 
 on:
   push:
+    branches:
+      - main
 
 jobs:
   discover:
@@ -62,7 +64,6 @@ jobs:
 
       # If merging into the main branch, publish new images
       - name: Publish Images
-        if: github.ref == 'refs/heads/main'
         run: |
           docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
           docker push ${{ steps.build_image.outputs.LATEST_IMAGE }}
