@@ -19,7 +19,8 @@ jobs:
       - name: Find buildable recipes
         id: find_recipes
         run: |
-          # Find application directories containing a 'docker-compose.yml' file
+          # Find application directories containing a 'Dockerfile' file
+          # Use a series of pipes to format the list directories as JSON without leading "./"
           dirs=$(find -name "Dockerfile" -exec dirname {} \; | cut -f2 -d/ | jq -R . | jq -s . | tr -d '\n')
           echo "Found directories: $dirs"
           echo "matrix={\"package_dir\":$dirs}" >> $GITHUB_OUTPUT
