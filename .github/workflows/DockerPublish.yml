@@ -8,17 +8,18 @@ jobs:
     name: Discover Build Recipes
     runs-on: ubuntu-latest
     outputs:
-      matrix: ${{ steps.find_tests.outputs.matrix }}
+      matrix: ${{ steps.find_recipes.outputs.matrix }}
 
     steps:
       - name: Checkout source
         uses: actions/checkout@v3
 
-      - name: Find testable apps
-        id: find_tests
+      - name: Find buildable recipes
+        id: find_recipes
         run: |
           # Find application directories containing a 'docker-compose.yml' file
           dirs=$(find . -name "docker-compose.yml" -exec dirname {} \; | jq -R . | jq -s . | tr -d '\n')
+          echo "Found directories: $dirs"
           echo "matrix={\"package_dir\":dirs}" >> $GITHUB_OUTPUT
 
   build:
