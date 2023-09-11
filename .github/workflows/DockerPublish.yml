@@ -42,19 +42,15 @@ jobs:
         id: build_image
         working-directory: ${{ matrix.package_dir }}
         run: |
+          # Get the destination where images are published to
           REPO=ghcr.io/${{ github.repository_owner }}
+          
+          # Get the application version from the directory name
           APP_NAME=$(echo ${{ matrix.package_dir }}/ | cut -f2 -d/)
-          CONFIG_NAME=$(echo ${{ matrix.package_dir }}/ | cut -f3 -d/)
 
-          # Create the image names
-          if [ $CONFIG_NAME ]; 
-          then
-            LATEST_IMAGE=$REPO/$APP_NAME:$CONFIG_NAME-latest
-            DATE_IMAGE=$REPO/$APP_NAME:$CONFIG_NAME-$(date +%Y%m%d)
-          else
-            LATEST_IMAGE=$REPO/$APP_NAME:latest
-            DATE_IMAGE=$REPO/$APP_NAME:$(date +%Y%m%d)
-          fi
+          # Define image names with tags for "latest" and for the current date
+          LATEST_IMAGE=$REPO/$APP_NAME:latest
+          DATE_IMAGE=$REPO/$APP_NAME:$(date +%Y%m%d)
 
           # Build the images
           IMAGE_NAME=$LATEST_IMAGE docker compose build
