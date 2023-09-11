@@ -60,6 +60,7 @@ jobs:
           echo "LATEST_IMAGE=$LATEST_IMAGE" >> "$GITHUB_OUTPUT"
           echo "DATE_IMAGE=$DATE_IMAGE" >> "$GITHUB_OUTPUT"
 
+      # If merging into the main branch, publish new images
       - name: Publish Images
         if: github.ref == 'refs/heads/main'
         run: |
