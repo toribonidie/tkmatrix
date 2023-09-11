@@ -20,7 +20,7 @@ jobs:
         id: find_recipes
         run: |
           # Find application directories containing a 'docker-compose.yml' file
-          dirs=$(find . -name "docker-compose.yml" -exec dirname {} \; | jq -R . | jq -s . | tr -d '\n')
+          dirs=$(find -name "Dockerfile" -exec dirname {} \; | cut -f2 -d/ | jq -R . | jq -s . | tr -d '\n')
           echo "Found directories: $dirs"
           echo "matrix={\"package_dir\":$dirs}" >> $GITHUB_OUTPUT
 
@@ -37,37 +37,22 @@ jobs:
       - name: Checkout source code
         uses: actions/checkout@v3
 
-      - name: Setup Docker Buildx
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Build compose file
-        id: build_image
-        working-directory: ${{ matrix.package_dir }}
-        run: |
-          # Get the destination where images are published to
-          REPO=ghcr.io/${{ github.repository_owner }}
-          
-          # Get the application version from the directory name
-          APP_NAME=$(echo ${{ matrix.package_dir }}/ | cut -f2 -d/)
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-          # Define image names with tags for "latest" and for the current date
-          LATEST_IMAGE=$REPO/$APP_NAME:latest
-          DATE_IMAGE=$REPO/$APP_NAME:$(date +%Y%m%d)
-
-          # Build the images
-          IMAGE_NAME=$LATEST_IMAGE docker compose build
-          IMAGE_NAME=$DATE_IMAGE   docker compose build
-          
-          # Export the image names for use downstream
-          echo "LATEST_IMAGE=$LATEST_IMAGE" >> "$GITHUB_OUTPUT"
-          echo "DATE_IMAGE=$DATE_IMAGE" >> "$GITHUB_OUTPUT"
-
-      # If merging into the main branch, publish new images
-      - name: Publish Images
-        run: |
-          docker login ghcr.io -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }}
-          docker push ${{ steps.build_image.outputs.LATEST_IMAGE }}
-          docker push ${{ steps.build_image.outputs.DATE_IMAGE }}
+      - name: Build and publish image
+        uses: docker/build-push-action@v4
+        with:
+          push: true
+          context: "{{defaultContext}}:${{ matrix.package_dir }}"
+          tags: ghcr.io/${{ github.repository_owner }}/tkmatrix:${{ matrix.package_dir }}
 
   # Use this job for branch protection rules
   build-successful:
