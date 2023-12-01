@@ -6,7 +6,7 @@ RUN dnf install -y \
       python310-devel
 
 # Per the tkmatrix docs, some dependencies must be individually installed
-# prior to installing kmatrix itself. Version numbers for these packages are
+# prior to installing tkmatrix itself. Version numbers for these packages are
 # pinned to the value defined in the requirements file.
 
 COPY requirements.txt requirements.txt
