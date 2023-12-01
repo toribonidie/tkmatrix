@@ -1,19 +1,34 @@
 FROM rockylinux:8
 
 RUN dnf install -y \
-      gcc-gfortran \
-      python310 \
-      python310-devel
+      gcc \
+      xz \
+      findutils \
+      openssl-devel \
+      bzip2-devel \
+      libffi-devel \
+      zlib-devel \
+      wget \
+      make \
+      gcc-gfortran
+
+RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tar.xz \
+    && tar -xf Python-3.10.5.tar.xz \
+    && cd Python-3.10.5 \
+    && ./configure --enable-optimizations \
+    && make -j 4 \
+    && make altinstall
 
 # Per the tkmatrix docs, some dependencies must be individually installed
 # prior to installing kmatrix itself. Version numbers for these packages are
 # pinned to the value defined in the requirements file.
 
+ENV PIP_ROOT_USER_ACTION=ignore
 COPY requirements.txt requirements.txt
-RUN pip3 install numpy==1.23.5 && \
-    pip3 install ellc==1.8.5 && \
-    pip3 install -r requirements.txt && \
-    pip3 install tkmatrix==0.7.0 
+RUN pip3.10 install numpy==1.23.5 && \
+    pip3.10 install ellc==1.8.5 && \
+    pip3.10 install -r requirements.txt && \
+    pip3.10 install tkmatrix==0.7.0
 
 RUN mkdir tkm
 WORKDIR /tkm
