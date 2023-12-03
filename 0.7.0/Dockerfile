@@ -1,25 +1,29 @@
-FROM rockylinux:8
-
 # This version of tkmatrix requires Python 3.10 which is not avilible
 # via the dnf package manager. Instead, we install some extra system
 # dependencies and compile Python from source.
 
+FROM rockylinux:8 as build
+
+RUN dnf install -y wget xz
+
+RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tar.xz \
+ && tar -xf Python-3.10.5.tar.xz
+
+FROM rockylinux:8
+
 RUN dnf install -y \
       gcc \
       gcc-c++ \
-      xz \
+      gcc-gfortran \
       findutils \
       openssl-devel \
       bzip2-devel \
       libffi-devel \
       zlib-devel \
-      wget \
-      make \
-      gcc-gfortran
+      make
 
-RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tar.xz \
-    && tar -xf Python-3.10.5.tar.xz \
-    && cd Python-3.10.5 \
+COPY --from=build Python-3.10.5 Python
+RUN cd Python \
     && ./configure --enable-optimizations \
     && make -j 4 \
     && make altinstall
