@@ -1,7 +1,12 @@
 FROM rockylinux:8
 
+# This version of tkmatrix requires Python 3.10 which is not avilible
+# via the dnf package manager. Instead, we install some extra system
+# dependencies and compile Python from source.
+
 RUN dnf install -y \
       gcc \
+      gcc-c++ \
       xz \
       findutils \
       openssl-devel \
