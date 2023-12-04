@@ -20,11 +20,12 @@ RUN microdnf install -y \
       bzip2-devel \
       libffi-devel \
       zlib-devel \
+      sqlite-devel \
       make
 
 COPY --from=build Python-3.10.5 python-dist
 RUN cd python-dist \
-    && ./configure --enable-optimizations \
+    && ./configure --enable-loadable-sqlite-extensions --enable-optimizations \
     && make -j 4 \
     && make -j 4 altinstall \
     && cd .. \
