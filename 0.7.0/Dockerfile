@@ -9,9 +9,9 @@ RUN dnf install -y wget xz
 RUN wget https://www.python.org/ftp/python/3.10.5/Python-3.10.5.tar.xz \
  && tar -xf Python-3.10.5.tar.xz
 
-FROM rockylinux:8
+FROM rockylinux:8-minimal
 
-RUN dnf install -y \
+RUN microdnf install -y \
       gcc \
       gcc-c++ \
       gcc-gfortran \
@@ -39,7 +39,8 @@ COPY requirements.txt requirements.txt
 RUN pip3.10 install numpy==1.23.5 && \
     pip3.10 install ellc==1.8.5 && \
     pip3.10 install -r requirements.txt && \
-    pip3.10 install tkmatrix==0.7.0
+    pip3.10 install tkmatrix==0.7.0 && \
+    pip cache purge
 
 RUN mkdir tkm
 WORKDIR /tkm
