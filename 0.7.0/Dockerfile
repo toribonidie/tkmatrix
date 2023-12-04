@@ -22,11 +22,13 @@ RUN dnf install -y \
       zlib-devel \
       make
 
-COPY --from=build Python-3.10.5 Python
-RUN cd Python \
+COPY --from=build Python-3.10.5 python-dist
+RUN cd python-dist \
     && ./configure --enable-optimizations \
     && make -j 4 \
-    && make altinstall
+    && make -j 4 altinstall \
+    && cd .. \
+    && rm -rf python-dist
 
 # Per the tkmatrix docs, some dependencies must be individually installed
 # prior to installing kmatrix itself. Version numbers for these packages are
